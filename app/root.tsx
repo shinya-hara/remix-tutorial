@@ -1,13 +1,14 @@
 import { LinksFunction, json, redirect } from "@remix-run/node";
 import {
   Form,
-  Link,
   Links,
   Meta,
+  NavLink,
   Outlet,
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useNavigation,
 } from "@remix-run/react";
 
 import appStylesHref from "./app.css?url";
@@ -29,6 +30,7 @@ export const action = async () => {
 
 export default function App() {
   const { contacts } = useLoaderData<typeof loader>();
+  const navigation = useNavigation();
 
   return (
     <html lang="en">
@@ -61,7 +63,12 @@ export default function App() {
               <ul>
                 {contacts.map((contact) => (
                   <li key={contact.id}>
-                    <Link to={`/contacts/${contact.id}`}>
+                    <NavLink
+                      className={({ isActive, isPending }) =>
+                        isActive ? "active" : isPending ? "pending" : ""
+                      }
+                      to={`/contacts/${contact.id}`}
+                    >
                       {contact.first || contact.last ? (
                         <>
                           {contact.first} {contact.last}
@@ -70,7 +77,7 @@ export default function App() {
                         <i>No Name</i>
                       )}{" "}
                       {contact.favorite ? <span>★</span> : null}
-                    </Link>
+                    </NavLink>
                   </li>
                 ))}
               </ul>
@@ -81,7 +88,10 @@ export default function App() {
             )}
           </nav>
         </div>
-        <div id="detail">
+        <div
+          className={navigation.state === "loading" ? "loading" : ""}
+          id="detail"
+        >
           <Outlet />
         </div>
 
